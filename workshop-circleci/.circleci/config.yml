@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.11.1.stretch
+    working_directory: ~/virothrach_repositories
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run: npm install
+      - setup_remote_docker
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - run:
+          name: "Build WTF"
+          command: 
+            docker build -t virothrach/node:lastest -f Dockerfile.staging &&
+            docker push virothrach/node:lastest
+      - run: echo success 
